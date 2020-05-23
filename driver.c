@@ -37,6 +37,12 @@
 #define SET_OPTION 0x9999
 #define COMMAND 0x10000
 
+#define MAX_BUFF 32
+#define LINE_BUFF 16
+
+unsigned char NAME[16] = {'j', 'h', 'L', 'e', 'e', 0};
+unsigned char STNUM[16] = {'2', '0', '1', '7', '1', '6','7','7', 0};
+
 //Global variable
 static int fpga_dot_port_usage = 0;
 static unsigned char *iom_fpga_dot_addr;
@@ -72,6 +78,13 @@ int iom_fpga_driver_open(struct inode *minode, struct file *mfile);
 int iom_fpga_driver_release(struct inode *minode, struct file *mfile);
 int iom_fpga_driver_ioctl(struct inode *, struct file *, unsigned int, unsigned long);
 
+int fnd_write(int value);
+int dot_write(int value);
+int lcd_write(int value);
+int led_write(int value);
+
+
+
 // define file_operations structure
 struct file_operations iom_fpga_driver_fops =
 {
@@ -80,6 +93,10 @@ open:        iom_fpga_driver_open,
 release:    iom_fpga_driver_release,
 ioctl:    iom_fpga_driver_ioctl,
 };
+
+//var
+int locNotZero;
+unsigned int loc[4];
 
 //the function which opens the drivers;
 int iom_fpga_driver_open(struct inode *minode, struct file *mfile)
@@ -110,14 +127,54 @@ int iom_fpga_driver_release(struct inode *minode, struct file *mfile)
 }
 
 
+int parse_init(unsigned int loc[4], int value){
+    int i = 0;
+    
+    //insert value in loc array
+    loc[0] = value % 10;
+    loc[1] = (value / 10) % 10;
+    loc[2] = (value / 100) % 10;
+    loc[3] = (value / 1000) % 10;
+    
+    //return "not 0 location"
+    for(i = 0; i < 4; i++){
+        if(loc[i] != 0) return ret;
+    }
+    return -1;
+}
+
+void concat_two_arr(unsigned char a[16], unsigned char b[16], unsigned char string[33]){
+    str_size=strlen(a);
+    if(str_size>0) {
+        strncat(string,a,str_size);
+        memset(string+str_size,' ',LINE_BUFF-str_size);
+    }
+
+    str_size=strlen(b);
+    if(str_size>0) {
+        strncat(string,b,str_size);
+        memset(string+LINE_BUFF+str_size,' ',LINE_BUFF-str_size);
+    }
+}
+
 int iom_fpga_driver_ioctl(struct inode *inode, struct file *flip, unsigned int cmd, unsigned long arg){
     copy_from_user(&msg, (char *)arg, sizeof(msg));
+    locNotZero = parse_init(loc, msg.init);
+    unsigned char string[33];
+    concat_two_arr(NAME, STNUM, string);
+    
     switch (cmd) {
         case SET_OPTION:
-            
+            fnd_write(loc);
+            dot_write(fpga_number[i]);
+            lcd_write(string);
+            led_write(1 << locNotZero);
             break;
         case COMMAND:
-            
+            fnd_write(msg.init);
+            dot_write(0);
+            lcd_write(0);
+            led_write(0);
             break;
         default:
             printk("invalid command\n");
@@ -127,6 +184,60 @@ int iom_fpga_driver_ioctl(struct inode *inode, struct file *flip, unsigned int c
     
     return 0;
 }
+
+int fnd_write(unsigned int value[4]){
+    unsigned short int value_short = 0;
+
+    value_short = value[0] << 12 | value[1] << 8 |value[2] << 4 |value[3];
+    outw(value_short,(unsigned int)iom_fpga_fnd_addr);
+    
+    return 0;
+}
+
+int dot_write(unsigned char value[10]){
+    int i;
+
+    for(i=0;i<length;i++)
+    {
+        _s_value = value[i] & 0x7F;
+        outw(_s_value,(unsigned int)iom_fpga_dot_addr+i*2);
+    }
+    
+    return 0;
+}
+
+int lcd_write(unsigned char value[33]){
+    int i;
+
+    unsigned short int _s_value = 0;
+    
+    value[length]=0;
+    printk("Get Size : %d / String : %s\n",length,value);
+
+    for(i=0;i<length;i++)
+    {
+        _s_value = (value[i] & 0xFF) << 8 | value[i + 1] & 0xFF;
+        outw(_s_value,(unsigned int)iom_fpga_text_lcd_addr+i);
+        i++;
+    }
+    
+    return 0;
+}
+
+int led_write(int value){
+    unsigned char value;
+    unsigned short _s_value;
+    const char *tmp = gdata;
+
+    if (copy_from_user(&value, tmp, 1))
+        return -EFAULT;
+
+    _s_value = (unsigned short)value;
+    outw(_s_value, (unsigned int)iom_fpga_led_addr);
+    
+    return 0;
+}
+
 
 int __init iom_fpga_driver_init(void)
 {
