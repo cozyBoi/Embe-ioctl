@@ -97,6 +97,10 @@ typedef struct ioctl_arguments {
 
 _argus msg;
 
+static int _interval;
+static int _cnt;
+static int _init;
+
 // define functions...
 int iom_fpga_driver_open(struct inode *minode, struct file *mfile);
 int iom_fpga_driver_release(struct inode *minode, struct file *mfile);
@@ -161,6 +165,11 @@ int parse_init(unsigned int loc[4], int value){
     loc[2] = (value / 100) % 10;
     loc[3] = (value / 1000) % 10;
     
+    printk("loc : ");
+    for(i = 0; i < 4; i++){
+        printk("%d ", loc[i]);
+    }
+    printk("\n");
     //return "not 0 location"
     for(i = 0; i < 4; i++){
         if(loc[i] != 0) return i;
@@ -247,12 +256,15 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
     
     copy_from_user(&msg, (_argus*)arg, sizeof(_argus));
     printk("%d %d %d %d\n", cmd, msg.interval, msg.cnt, msg.init);
+    _interval = msg.interval;
+    _cnt = msg.cnt;
+    _init = msg.init;
     unsigned char string[33];
     
     switch (cmd) {
         case SET_OPTION:
             printk("start set\n");
-            //locNotZero = parse_init(loc, msg.init);
+            locNotZero = parse_init(loc, _init);
             //concat_two_arr(NAME, STNUM, string, 0, 0);
             printk("end para init\n");
             
