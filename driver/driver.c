@@ -105,7 +105,7 @@ int iom_fpga_driver_ioctl(struct inode *, struct file *, unsigned int, unsigned 
 int fnd_write(unsigned int value[4]);
 int dot_write(unsigned char value[10]);
 int lcd_write(unsigned char value[33]);
-int led_write(int value);
+int led_write(unsigned char  value);
 
 
 
@@ -296,7 +296,7 @@ int lcd_write(unsigned char value[33]){
 
     unsigned short int _s_value = 0;
 
-    for(i=0;i<length;i++)
+    for(i=0;i<33;i++)
     {
         _s_value = (value[i] & 0xFF) << 8 | value[i + 1] & 0xFF;
         outw(_s_value,(unsigned int)iom_fpga_text_lcd_addr+i);
