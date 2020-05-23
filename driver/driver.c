@@ -6,14 +6,16 @@
 #include <linux/delay.h>
 
 #include <asm/io.h>
-#include <asm/uaccess.h>
+#include <asm/ioctl.h>
 #include <linux/kernel.h>
 #include <linux/ioport.h>
 #include <linux/module.h>
 #include <linux/fs.h>
 #include <linux/init.h>
 #include <linux/version.h>
-#include <include/asm/param.h>
+#include <linux/timer.h>
+#include <linux/uaccess.h>
+
 
 unsigned char fpga_number[10][10] = {
     {0x3e,0x7f,0x63,0x73,0x73,0x6f,0x67,0x63,0x7f,0x3e}, // 0
