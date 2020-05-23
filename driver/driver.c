@@ -256,7 +256,7 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
             concat_two_arr(NAME, STNUM, string, 0, 0);
             printk("end para init\n");
             
-            fnd_write(loc);
+            //fnd_write(loc);
             printk("end fnd init\n");
             //dot_write(fpga_number[loc[locNotZero]]);
             printk("end dot init\n");
