@@ -84,12 +84,13 @@ int main(int argc, char **argv)
     msg.interval = data1;
     msg.cnt = data2;
     msg.init = data3;
-    
+    unsigned int CMD = SET_OPTION;
     dev = open(DEVICE, O_RDWR);
     printf("ioctl : SET_OPTION\n");
-    ioctl(dev, SET_OPTION, &msg);
+    ioctl(dev, CMD, &msg);
     printf("ioctl : COMMAND\n");
-    ioctl(dev, COMMAND, &msg);
+    CMD = COMMAND;
+    ioctl(dev, CMD, &msg);
     
 	close(dev);
 
