@@ -265,7 +265,7 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
         case SET_OPTION:
             printk("start set\n");
             locNotZero = parse_init(loc, _init);
-            //concat_two_arr(NAME, STNUM, string, 0, 0);
+            concat_two_arr(NAME, STNUM, string, 0, 0);
             printk("end para init\n");
             
             //fnd_write(loc);
