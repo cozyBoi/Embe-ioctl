@@ -13,6 +13,7 @@
 #include <linux/fs.h>
 #include <linux/init.h>
 #include <linux/version.h>
+#include <include/asm/param.h>
 
 #include "./fpga_dot_font.h"
 
@@ -33,6 +34,9 @@
 #define IOM_LED_ADDRESS 0x08000016 // pysical address
 #define IOM_FPGA_TEXT_LCD_ADDRESS 0x08000090 // pysical address - 32 Byte (16 * 2)
 
+#define SET_OPTION 0x9999
+#define COMMAND 0x10000
+
 //Global variable
 static int fpga_dot_port_usage = 0;
 static unsigned char *iom_fpga_dot_addr;
@@ -46,8 +50,24 @@ static unsigned char *iom_fpga_led_addr;
 static int fpga_text_lcd_port_usage = 0;
 static unsigned char *iom_fpga_text_lcd_addr;
 
+static int kernel_timer_usage = 0;
+
+static struct struct_mydata {
+    struct timer_list timer;
+    int count;
+};
+
+struct struct_mydata mydata;
+
+typedef struct ioctl_arguments {
+    int interval;
+    int cnt;
+    int init;
+ }_argus;
+
+_argus msg;
+
 // define functions...
-ssize_t iom_fpga_driver_write(struct file *inode, const char *gdata, size_t length, loff_t *off_what);
 int iom_fpga_driver_open(struct inode *minode, struct file *mfile);
 int iom_fpga_driver_release(struct inode *minode, struct file *mfile);
 int iom_fpga_driver_ioctl(struct inode *, struct file *, unsigned int, unsigned long);
@@ -55,11 +75,10 @@ int iom_fpga_driver_ioctl(struct inode *, struct file *, unsigned int, unsigned 
 // define file_operations structure
 struct file_operations iom_fpga_driver_fops =
 {
-    owner:        THIS_MODULE,
-    open:        iom_fpga_driver_open,
-    write:        iom_fpga_driver_write,
-    release:    iom_fpga_driver_release,
-    ioctl:    iom_fpga_driver_ioctl,
+owner:        THIS_MODULE,
+open:        iom_fpga_driver_open,
+release:    iom_fpga_driver_release,
+ioctl:    iom_fpga_driver_ioctl,
 };
 
 //the function which opens the drivers;
@@ -69,11 +88,13 @@ int iom_fpga_driver_open(struct inode *minode, struct file *mfile)
     if(fpga_fnd_port_usage != 0) return -EBUSY;
     if(ledport_usage != 0) return -EBUSY;
     if(fpga_text_lcd_port_usage != 0) return -EBUSY;
-
+    if(kernel_timer_usage != 0) return -EBUSY;
+    
     fpga_dot_port_usage = 1;
     fpga_fnd_port_usage = 1;
     ledport_usage = 1;
     fpga_text_lcd_port_usage = 1;
+    kernel_timer_usage = 1;
     return 0;
 }
 
@@ -84,33 +105,25 @@ int iom_fpga_driver_release(struct inode *minode, struct file *mfile)
     fpga_fnd_port_usage = 0;
     ledport_usage = 0;
     fpga_text_lcd_port_usage = 0;
+    kernel_timer_usage = 0;
     return 0;
 }
 
-// when write to fpga_dot device  ,call this function
-ssize_t iom_fpga_driver_write(struct file *inode, const char *gdata, size_t length, loff_t *off_what)
-{
-    //여기에 소스 다 복붙하고 각각 조금씩 수정해야함
-    int i;
 
-    unsigned char value[10];
-    unsigned short int _s_value;
-    const char *tmp = gdata;
-
-    if (copy_from_user(&value, tmp, length))
-        return -EFAULT;
-
-    for(i=0;i<length;i++)
-    {
-        _s_value = value[i] & 0x7F;
-        outw(_s_value,(unsigned int)iom_fpga_dot_addr+i*2);
+int iom_fpga_driver_ioctl(struct inode *inode, struct file *flip, unsigned int cmd, unsigned long arg){
+    copy_from_user(&msg, (char *)arg, sizeof(msg));
+    switch (cmd) {
+        case SET_OPTION:
+            
+            break;
+        case COMMAND:
+            
+            break;
+        default:
+            printk("invalid command\n");
+            break;
     }
     
-    return length;
-}
-
-
-int iom_fpga_driver_ioctl(struct inode *, struct file *, unsigned int, unsigned long){
     
     return 0;
 }
@@ -129,9 +142,18 @@ int __init iom_fpga_driver_init(void)
         printk(KERN_WARNING"Can't get any major of FND\n");
         return result;
     }
+    
+    printk("kernel_timer_init\n");
 
+    //timer init
+    init_timer(&(mydata.timer));
+
+    printk("init module\n");
+    kernel_call_cnt = (unsigned char*)vmalloc(4);
+    kernel_call_cnt[0] = 0;
+    
     printk("init module, %s major number : %d\n", "dev drivers", 242);
-
+    
     return 0;
 }
 
@@ -141,6 +163,11 @@ void __exit iom_fpga_driver_exit(void)
     iounmap(iom_fpga_text_lcd_addr);
     iounmap(iom_fpga_led_addr);
     iounmap(iom_fpga_fnd_addr);
+    
+    printk("kernel_timer_exit\n");
+    printk("%d\n", kernel_call_cnt[0]); //print
+    vfree(kernel_call_cnt); //free
+    del_timer_sync(&mydata.timer);
     
     unregister_chrdev(242, "/dev/dev_driver");
 }
