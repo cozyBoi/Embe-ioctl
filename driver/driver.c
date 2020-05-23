@@ -65,7 +65,7 @@ unsigned char fpga_set_blank[10] = {
 
 unsigned char NAME[16] = {'j', 'h', 'L', 'e', 'e', 0};
 unsigned char STNUM[16] = {'2', '0', '1', '7', '1', '6','7','7', 0};
-unsigned char*kernel_call_cnt;
+unsigned int kernel_call_cnt;
 
 //Global variable
 static int fpga_dot_port_usage = 0;
@@ -215,7 +215,7 @@ static void kernel_timer_blink(unsigned long timeout) {
     struct struct_mydata *p_data = (struct struct_mydata*)timeout;
 
     printk("kernel_timer_blink %d\n", p_data->count);
-    kernel_call_cnt[0]++; //count calling
+    kernel_call_cnt++; //count calling
     p_data->count--;
     if( p_data->count < 0 ) {
         return;
@@ -337,8 +337,7 @@ int __init iom_fpga_driver_init(void)
     init_timer(&(mydata.timer));
 
     printk("init module\n");
-    kernel_call_cnt = (unsigned char*)vmalloc(4);
-    kernel_call_cnt[0] = 0;
+    kernel_call_cnt = 0;
     
     printk("init module, %s major number : %d\n", "dev drivers", 242);
     
@@ -353,8 +352,7 @@ void __exit iom_fpga_driver_exit(void)
     iounmap(iom_fpga_fnd_addr);
     
     printk("kernel_timer_exit\n");
-    printk("%d\n", kernel_call_cnt[0]); //print
-    vfree(kernel_call_cnt); //free
+    printk("%d\n", kernel_call_cnt); //print
     del_timer_sync(&mydata.timer);
     
     unregister_chrdev(242, "/dev/dev_driver");
