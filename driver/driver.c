@@ -244,7 +244,7 @@ static void kernel_timer_blink(unsigned long timeout) {
 //int iom_fpga_driver_ioctl(struct inode *inode, struct file *flip, unsigned int cmd, unsigned long arg){
 long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long arg){
     printk("driver ioctl : ");
-    /*
+    
     copy_from_user(&msg, (_argus*)arg, sizeof(_argus));
     printk("%d %d %d %d\n", cmd, msg.interval, msg.cnt, msg.init);
     unsigned char string[33];
@@ -276,7 +276,7 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
             printk("invalid command\n");
             break;
     }
-    */
+    
     return 0;
 }
 
