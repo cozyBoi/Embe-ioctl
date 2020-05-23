@@ -1,4 +1,4 @@
-obj-m   := main.o
+obj-m   := driver.o
 
 KDIR    :=/work/achroimx_kernel
 PWD     :=$(shell pwd)
