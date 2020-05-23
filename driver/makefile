@@ -1,7 +1,7 @@
 CC=arm-none-linux-gnueabi-gcc
 .SUFFIXES: .c .h .o
 
-#DEPS= main.h #input_process.h output_process.h
+DEPS= fpga_dot_font.h #input_process.h output_process.h
 CFLAGS= #-W
 
 TARGET = 20171677_hw2
