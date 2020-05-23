@@ -207,10 +207,11 @@ static int len_name = 5, len_num = 8;
 static int unit_name = 1, unit_num = 1;
 
 void update_string(){
-    if(start_name + len_name == 15){
+    if(start_name + len_name == 16 || start_name + len_name == 0){
         unit_name *= -1;
     }
-    if(start_num + len_num == 15){
+    
+    if(start_num + len_num == 16 || start_num + len_num == 0){
         unit_num *= -1;
     }
     
