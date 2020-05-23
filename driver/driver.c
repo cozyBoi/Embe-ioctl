@@ -213,6 +213,7 @@ void update_string(){
 }
 
 static void kernel_timer_blink(unsigned long timeout) {
+    printk("start blink\n");
     struct struct_mydata *p_data = (struct struct_mydata*)timeout;
 
     printk("kernel_timer_blink %d\n", p_data->count);
@@ -223,7 +224,7 @@ static void kernel_timer_blink(unsigned long timeout) {
     }
     
     update_loc();
-    update_string();
+    //update_string();
     
     unsigned char string[33];
     concat_two_arr(NAME, STNUM, string, start_name, start_num);
@@ -249,15 +250,21 @@ int iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long arg
     
     switch (cmd) {
         case SET_OPTION:
+            printk("start set\n");
             locNotZero = parse_init(loc, msg.init);
             concat_two_arr(NAME, STNUM, string, 0, 0);
+            printk("end para init\n");
             
             fnd_write(loc);
+            printk("end fnd init\n");
             dot_write(fpga_number[loc[locNotZero]]);
+            printk("end dot init\n");
             //lcd_write(string);
             led_write(1 << locNotZero);
+            printk("end set\n");
             break;
         case COMMAND:
+            printk("start COMMAND\n");
             mydata.timer.expires = jiffies + msg.interval * 100; //after 3 second, call "blink"
             mydata.timer.data = (unsigned long)&mydata;
             mydata.timer.function = kernel_timer_blink;

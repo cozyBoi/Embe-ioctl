@@ -47,41 +47,8 @@ int main(int argc, char **argv)
 		printf("please input the parameter! \n");
 		printf("ex)./app a1 a2 a3\n");
 		return -1;
-	}
-
-    str_size=(strlen(argv[1]));
-    
-    for(i=0;i<str_size;i++)
-    {
-        if((argv[1][i]<0x30)||(argv[1][i])>0x39) {
-            printf("Error! Invalid Value!\n");
-            return -1;
-        }
-        data1 += (argv[1][i]-0x30) * pow10(i);
-    }
-
-    str_size=(strlen(argv[2]));
-
-    for(i=0;i<str_size;i++)
-    {
-        if((argv[2][i]<0x30)||(argv[2][i])>0x39) {
-            printf("Error! Invalid Value!\n");
-            return -1;
-        }
-        data2 += (argv[2][i]-0x30) * pow10(i);
     }
     
-    str_size=(strlen(argv[3]));
-    
-    for(i=0;i<str_size;i++)
-    {
-        if((argv[3][i]<0x30)||(argv[3][i])>0x39) {
-            printf("Error! Invalid Value!\n");
-            return -1;
-        }
-        data3 += (argv[3][i]-0x30) * pow10(i);
-    }
-    printf("data %d %d %d\n", data1, data2, data3);
     data1 = atoi(argv[1]);
     data2 = atoi(argv[2]);
     data3 = atoi(argv[3]);
