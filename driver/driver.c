@@ -292,7 +292,12 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
     return 0;
 }
 
-int fnd_write(unsigned int value[4]){
+int fnd_write(unsigned int _value[4]){
+    unsigned int value[4];
+    int i = 0;
+    for(i = 0; i < 4; i++){
+        value[i] = _value[3-i];
+    }
     unsigned short int value_short = 0;
 
     value_short = value[0] << 12 | value[1] << 8 |value[2] << 4 |value[3];
