@@ -86,7 +86,9 @@ int main(int argc, char **argv)
     msg.init = data3;
     
     dev = open(DEVICE, O_RDWR);
+    printf("ioctl : SET_OPTION\n");
     ioctl(dev, SET_OPTION, &msg);
+    printf("ioctl : COMMAND\n");
     ioctl(dev, COMMAND, &msg);
     
 	close(dev);

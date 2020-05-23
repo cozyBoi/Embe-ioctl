@@ -119,8 +119,8 @@ unlocked_ioctl:    iom_fpga_driver_ioctl,
 };
 
 //var
-int locNotZero;
-unsigned int loc[4];
+static int locNotZero;
+static unsigned int loc[4];
 
 //the function which opens the drivers;
 int iom_fpga_driver_open(struct inode *minode, struct file *mfile)
@@ -195,9 +195,9 @@ void update_loc(){
     loc[locNotZero]++;
 }
 
-int start_name = 0, start_num = 0;
-int len_name = 5, len_num = 8;
-int unit_name = 1, unit_num = 1;
+static int start_name = 0, start_num = 0;
+static int len_name = 5, len_num = 8;
+static int unit_name = 1, unit_num = 1;
 
 void update_string(){
     if(start_name + len_name == 15){
@@ -240,7 +240,9 @@ static void kernel_timer_blink(unsigned long timeout) {
 }
 
 int iom_fpga_driver_ioctl(struct inode *inode, struct file *flip, unsigned int cmd, unsigned long arg){
+    printk("driver ioctl : ");
     copy_from_user(&msg, (char *)arg, sizeof(msg));
+    printk("%d %d %d\n", msg.interval, msg.cnt, msg.init);
     unsigned char string[33];
     
     switch (cmd) {
