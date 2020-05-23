@@ -65,7 +65,7 @@ unsigned char fpga_set_blank[10] = {
 
 unsigned char NAME[16] = {'j', 'h', 'L', 'e', 'e', 0};
 unsigned char STNUM[16] = {'2', '0', '1', '7', '1', '6','7','7', 0};
-unsigned char kernel_call_cnt[4];
+unsigned char*kernel_call_cnt;
 
 //Global variable
 static int fpga_dot_port_usage = 0;
@@ -102,9 +102,9 @@ int iom_fpga_driver_open(struct inode *minode, struct file *mfile);
 int iom_fpga_driver_release(struct inode *minode, struct file *mfile);
 int iom_fpga_driver_ioctl(struct inode *, struct file *, unsigned int, unsigned long);
 
-int fnd_write(int value);
-int dot_write(int value);
-int lcd_write(int value);
+int fnd_write(unsigned int value[4]);
+int dot_write(unsigned char value[10]);
+int lcd_write(unsigned char value[33]);
 int led_write(int value);
 
 
@@ -115,7 +115,7 @@ struct file_operations iom_fpga_driver_fops =
 owner:        THIS_MODULE,
 open:        iom_fpga_driver_open,
 release:    iom_fpga_driver_release,
-ioctl:    iom_fpga_driver_ioctl,
+unlocked_ioctl:    iom_fpga_driver_ioctl,
 };
 
 //var
@@ -162,14 +162,14 @@ int parse_init(unsigned int loc[4], int value){
     
     //return "not 0 location"
     for(i = 0; i < 4; i++){
-        if(loc[i] != 0) return ret;
+        if(loc[i] != 0) return i;
     }
     return -1;
 }
 
 void concat_two_arr(unsigned char a[16], unsigned char b[16], unsigned char string[33], int start_a, int start_b){
     
-    int i;
+    int i, str_size;
     for(i = 0; i < 32; i++){
         string[i] = ' ';
     }
@@ -249,7 +249,7 @@ int iom_fpga_driver_ioctl(struct inode *inode, struct file *flip, unsigned int c
             concat_two_arr(NAME, STNUM, string, 0, 0);
             
             fnd_write(loc);
-            dot_write(fpga_number[i]);
+            dot_write(fpga_number[loc[locNotZero]]);
             lcd_write(string);
             led_write(1 << locNotZero);
             break;
@@ -280,7 +280,9 @@ int fnd_write(unsigned int value[4]){
 int dot_write(unsigned char value[10]){
     int i;
 
-    for(i=0;i<length;i++)
+     unsigned short int _s_value = 0;
+    
+    for(i=0;i<10;i++)
     {
         _s_value = value[i] & 0x7F;
         outw(_s_value,(unsigned int)iom_fpga_dot_addr+i*2);
@@ -293,9 +295,6 @@ int lcd_write(unsigned char value[33]){
     int i;
 
     unsigned short int _s_value = 0;
-    
-    value[length]=0;
-    printk("Get Size : %d / String : %s\n",length,value);
 
     for(i=0;i<length;i++)
     {
@@ -307,13 +306,8 @@ int lcd_write(unsigned char value[33]){
     return 0;
 }
 
-int led_write(int value){
-    unsigned char value;
+int led_write(unsigned char  value){
     unsigned short _s_value;
-    const char *tmp = gdata;
-
-    if (copy_from_user(&value, tmp, 1))
-        return -EFAULT;
 
     _s_value = (unsigned short)value;
     outw(_s_value, (unsigned int)iom_fpga_led_addr);
