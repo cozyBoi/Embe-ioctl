@@ -236,7 +236,7 @@ static void kernel_timer_blink(unsigned long timeout) {
     //update_string();
     
     unsigned char string[33];
-    concat_two_arr(NAME, STNUM, string, start_name, start_num);
+    //concat_two_arr(NAME, STNUM, string, start_name, start_num);
     
     fnd_write(loc);
     dot_write(fpga_number[loc[locNotZero]]);
@@ -278,12 +278,11 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
             break;
         case COMMAND:
             printk("start COMMAND\n");
-            /*
             mydata.timer.expires = jiffies + msg.interval * 100; //after 3 second, call "blink"
             mydata.timer.data = (unsigned long)&mydata;
             mydata.timer.function = kernel_timer_blink;
             add_timer(&mydata.timer);
-            mydata.count = msg.cnt;*/
+            mydata.count = msg.cnt;
             break;
         default:
             printk("invalid command\n");
