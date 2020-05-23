@@ -85,6 +85,7 @@ int main(int argc, char **argv)
     data1 = atoi(argv[1]);
     data2 = atoi(argv[2]);
     data3 = atoi(argv[3]);
+    printf("data %d %d %d\n", data1, data2, data3);
     
     msg.interval = data1;
     msg.cnt = data2;
