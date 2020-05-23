@@ -258,19 +258,20 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
             
             fnd_write(loc);
             printk("end fnd init\n");
-            dot_write(fpga_number[loc[locNotZero]]);
+            //dot_write(fpga_number[loc[locNotZero]]);
             printk("end dot init\n");
             //lcd_write(string);
-            led_write(1 << locNotZero);
+            //led_write(1 << locNotZero);
             printk("end set\n");
             break;
         case COMMAND:
             printk("start COMMAND\n");
+            /*
             mydata.timer.expires = jiffies + msg.interval * 100; //after 3 second, call "blink"
             mydata.timer.data = (unsigned long)&mydata;
             mydata.timer.function = kernel_timer_blink;
             add_timer(&mydata.timer);
-            mydata.count = msg.cnt;
+            mydata.count = msg.cnt;*/
             break;
         default:
             printk("invalid command\n");
