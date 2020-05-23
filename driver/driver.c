@@ -100,7 +100,8 @@ _argus msg;
 // define functions...
 int iom_fpga_driver_open(struct inode *minode, struct file *mfile);
 int iom_fpga_driver_release(struct inode *minode, struct file *mfile);
-int iom_fpga_driver_ioctl(struct inode *, struct file *, unsigned int, unsigned long);
+//int iom_fpga_driver_ioctl(struct inode *, struct file *, unsigned int, unsigned long);
+int iom_fpga_driver_ioctl(struct file *, unsigned int, unsigned long);
 
 int fnd_write(unsigned int value[4]);
 int dot_write(unsigned char value[10]);
