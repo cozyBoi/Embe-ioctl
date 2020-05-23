@@ -239,7 +239,8 @@ static void kernel_timer_blink(unsigned long timeout) {
     add_timer(&mydata.timer);
 }
 
-int iom_fpga_driver_ioctl(struct inode *inode, struct file *flip, unsigned int cmd, unsigned long arg){
+//int iom_fpga_driver_ioctl(struct inode *inode, struct file *flip, unsigned int cmd, unsigned long arg){
+int iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long arg){
     printk("driver ioctl : ");
     copy_from_user(&msg, (char*)arg, sizeof(msg));
     printk("%d %d %d %d\n", cmd, msg.interval, msg.cnt, msg.init);
