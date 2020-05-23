@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     }
 
     str_size=(strlen(argv[2]));
-    
+
     for(i=0;i<str_size;i++)
     {
         if((argv[2][i]<0x30)||(argv[2][i])>0x39) {
@@ -81,6 +81,11 @@ int main(int argc, char **argv)
         }
         data3 += (argv[3][i]-0x30) * pow10(i);
     }
+    printf("data %d %d %d\n", data1, data2, data3);
+    data1 = atoi(argv[1]);
+    data2 = atoi(argv[2]);
+    data3 = atoi(argv[3]);
+    
     msg.interval = data1;
     msg.cnt = data2;
     msg.init = data3;
