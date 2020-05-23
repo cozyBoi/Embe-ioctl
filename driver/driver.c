@@ -230,7 +230,7 @@ static void kernel_timer_blink(unsigned long timeout) {
     }
     
     update_loc();
-    //update_string();
+    update_string();
     
     unsigned char string[33];
     concat_two_arr(NAME, STNUM, string, start_name, start_num);
@@ -262,14 +262,14 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
         case SET_OPTION:
             printk("start set\n");
             locNotZero = parse_init(loc, _init);
-            //concat_two_arr(NAME, STNUM, string, 0, 0);
+            concat_two_arr(NAME, STNUM, string, 0, 0);
             printk("end para init\n");
             
             fnd_write(loc);
             printk("end fnd init\n");
             dot_write(fpga_number[loc[locNotZero]]);
             printk("end dot init\n");
-            //lcd_write(string);
+            lcd_write(string);
             led_write(1 << locNotZero);
             printk("end set\n");
             break;
