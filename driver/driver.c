@@ -179,21 +179,18 @@ int parse_init(unsigned int loc[4], int value){
 
 void concat_two_arr(unsigned char a[16], unsigned char b[16], unsigned char string[33], int start_a, int start_b){
     
-    int i, str_size;
+    int i;
     for(i = 0; i < 32; i++){
         string[i] = ' ';
     }
     string[i] = 0;
     
-    str_size=strlen(a);
-    
-    if(str_size>0) {
-        strncat(&string[start_a],a,str_size);
+    for(i = 0; NAME[i] != 0 && i < 16; i++){
+        string[start_a + i] = NAME[i];
     }
-
-    str_size=strlen(b);
-    if(str_size>0) {
-        strncat(&string[start_b],b,str_size);
+    
+    for(i = 0; STNUM[i] != 0 && i < 16; i++){
+        string[16 + start_b + i] = STNUM[i];
     }
 }
 
@@ -236,11 +233,11 @@ static void kernel_timer_blink(unsigned long timeout) {
     //update_string();
     
     unsigned char string[33];
-    //concat_two_arr(NAME, STNUM, string, start_name, start_num);
+    concat_two_arr(NAME, STNUM, string, start_name, start_num);
     
     fnd_write(loc);
     dot_write(fpga_number[loc[locNotZero]]);
-    //lcd_write(string);
+    lcd_write(string);
     led_write(1 << locNotZero);
     
     mydata.timer.expires = get_jiffies_64() + _interval * 10; //call itself after 3 second
