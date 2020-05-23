@@ -42,6 +42,7 @@
 
 unsigned char NAME[16] = {'j', 'h', 'L', 'e', 'e', 0};
 unsigned char STNUM[16] = {'2', '0', '1', '7', '1', '6','7','7', 0};
+unsigned char kernel_call_cnt[4];
 
 //Global variable
 static int fpga_dot_port_usage = 0;
@@ -143,44 +144,103 @@ int parse_init(unsigned int loc[4], int value){
     return -1;
 }
 
-void concat_two_arr(unsigned char a[16], unsigned char b[16], unsigned char string[33]){
+void concat_two_arr(unsigned char a[16], unsigned char b[16], unsigned char string[33], int start_a, int start_b){
+    
+    int i;
+    for(i = 0; i < 32; i++){
+        string[i] = ' ';
+    }
+    string[i] = 0;
+    
     str_size=strlen(a);
+    
     if(str_size>0) {
-        strncat(string,a,str_size);
-        memset(string+str_size,' ',LINE_BUFF-str_size);
+        strncat(&string[start_a],a,str_size);
     }
 
     str_size=strlen(b);
     if(str_size>0) {
-        strncat(string,b,str_size);
-        memset(string+LINE_BUFF+str_size,' ',LINE_BUFF-str_size);
+        strncat(&string[start_b],b,str_size);
     }
+}
+
+void update_loc(){
+    if(loc[locNotZero] == 8){
+        loc[locNotZero] = 0;
+        locNotZero = (locNotZero + 1) % 4;
+    }
+    loc[locNotZero]++;
+}
+
+int start_name = 0, start_num = 0;
+int len_name = 5, len_num = 8;
+int unit_name = 1, unit_num = 1;
+
+void update_string(){
+    if(start_name + len_name == 15){
+        unit_name *= -1;
+    }
+    if(start_num + len_num == 15){
+        unit_num *= -1;
+    }
+    
+    start_name += unit_name;
+    start_num += unit_num;
+}
+
+static void kernel_timer_blink(unsigned long timeout) {
+    struct struct_mydata *p_data = (struct struct_mydata*)timeout;
+
+    printk("kernel_timer_blink %d\n", p_data->count);
+    kernel_call_cnt[0]++; //count calling
+    p_data->count--;
+    if( p_data->count < 0 ) {
+        return;
+    }
+    
+    update_loc();
+    update_string();
+    
+    unsigned char string[33];
+    concat_two_arr(NAME, STNUM, string, start_name, start_num);
+    
+    fnd_write(loc);
+    dot_write(fpga_number[loc[locNotZero]]);
+    lcd_write(string);
+    led_write(1 << locNotZero);
+    
+    mydata.timer.expires = get_jiffies_64() + msg.interval * 100; //call itself after 3 second
+    mydata.timer.data = (unsigned long)&mydata;
+    mydata.timer.function = kernel_timer_blink;
+
+    add_timer(&mydata.timer);
 }
 
 int iom_fpga_driver_ioctl(struct inode *inode, struct file *flip, unsigned int cmd, unsigned long arg){
     copy_from_user(&msg, (char *)arg, sizeof(msg));
-    locNotZero = parse_init(loc, msg.init);
     unsigned char string[33];
-    concat_two_arr(NAME, STNUM, string);
     
     switch (cmd) {
         case SET_OPTION:
+            locNotZero = parse_init(loc, msg.init);
+            concat_two_arr(NAME, STNUM, string, 0, 0);
+            
             fnd_write(loc);
             dot_write(fpga_number[i]);
             lcd_write(string);
             led_write(1 << locNotZero);
             break;
         case COMMAND:
-            fnd_write(msg.init);
-            dot_write(0);
-            lcd_write(0);
-            led_write(0);
+            mydata.timer.expires = jiffies + msg.interval * 100; //after 3 second, call "blink"
+            mydata.timer.data = (unsigned long)&mydata;
+            mydata.timer.function = kernel_timer_blink;
+            add_timer(&mydata.timer);
+            mydata.count = msg.cnt;
             break;
         default:
             printk("invalid command\n");
             break;
     }
-    
     
     return 0;
 }
