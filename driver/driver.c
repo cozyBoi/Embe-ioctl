@@ -227,6 +227,7 @@ static void kernel_timer_blink(unsigned long timeout) {
     kernel_call_cnt++; //count calling
     p_data->count--;
     if( p_data->count < 0 ) {
+        int i;
         loc[3] = loc[2] = loc[1] = loc[0] = 0;
         fnd_write(loc);
         dot_write(fpga_set_blank);
