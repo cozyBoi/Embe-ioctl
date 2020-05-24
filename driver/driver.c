@@ -195,7 +195,7 @@ void concat_two_arr(unsigned char a[16], unsigned char b[16], unsigned char stri
 }
 
 void update_loc(){
-    if(blink_cnt == 8){
+    if(blink_cnt == 7){
         unsigned int tmp;
         blink_cnt = 0;
         tmp = loc[locNotZero];
