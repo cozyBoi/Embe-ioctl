@@ -222,7 +222,7 @@ void update_string(){
 static void kernel_timer_blink(unsigned long timeout) {
     printk("start blink\n");
     struct struct_mydata *p_data = (struct struct_mydata*)timeout;
-
+    unsigned char string[33];
     printk("kernel_timer_blink %d\n", p_data->count);
     kernel_call_cnt++; //count calling
     p_data->count--;
@@ -240,7 +240,6 @@ static void kernel_timer_blink(unsigned long timeout) {
     update_loc();
     update_string();
     
-    unsigned char string[33];
     concat_two_arr(NAME, STNUM, string, start_name, start_num);
     
     fnd_write(loc);
