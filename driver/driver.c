@@ -63,8 +63,8 @@ unsigned char fpga_set_blank[10] = {
 #define MAX_BUFF 32
 #define LINE_BUFF 16
 
-unsigned char STNUM[16] = {'j', 'h', 'L', 'e', 'e', 0};
-unsigned char NAME[16] = {'2', '0', '1', '7', '1', '6','7','7', 0};
+unsigned char NAME[16] = {'j', 'h', 'L', 'e', 'e', 0};
+unsigned char STNUM[16] = {'2', '0', '1', '7', '1', '6','7','7', 0};
 unsigned int kernel_call_cnt;
 
 //Global variable
@@ -240,8 +240,8 @@ static void kernel_timer_blink(unsigned long timeout) {
     update_loc();
     update_string();
     
-    concat_two_arr(NAME, STNUM, string, start_name, start_num);
-    
+    //concat_two_arr(NAME, STNUM, string, start_name, start_num);
+    concat_two_arr(STNUM, NAME, string, start_num, start_name);
     fnd_write(loc);
     dot_write(fpga_number[loc[locNotZero]]);
     lcd_write(string);
@@ -269,7 +269,8 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
         case SET_OPTION:
             printk("start set\n");
             locNotZero = parse_init(loc, _init);
-            concat_two_arr(NAME, STNUM, string, 0, 0);
+            //concat_two_arr(NAME, STNUM, string, 0, 0);
+            concat_two_arr(STNUM, NAME, string, 0, 0);
             printk("end para init\n");
             
             fnd_write(loc);
