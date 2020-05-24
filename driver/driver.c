@@ -241,6 +241,7 @@ static void kernel_timer_blink(unsigned long timeout) {
         for(i = 0; i < 32; i++) string[i] = ' ';
         lcd_write(string);
         led_write(0);
+        start_num = start_name = 0;
         return;
     }
     
