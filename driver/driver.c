@@ -185,12 +185,12 @@ void concat_two_arr(unsigned char a[16], unsigned char b[16], unsigned char stri
     }
     string[i] = 0;
     
-    for(i = 0; NAME[i] != 0 && i < 16; i++){
-        string[start_a + i] = NAME[i];
+    for(i = 0; STNUM[i] != 0 && i < 16; i++){
+        string[start_a + i] = STNUM[i];
     }
     
-    for(i = 0; STNUM[i] != 0 && i < 16; i++){
-        string[16 + start_b + i] = STNUM[i];
+    for(i = 0; NAME[i] != 0 && i < 16; i++){
+        string[16 + start_b + i] = NAME[i];
     }
 }
 
