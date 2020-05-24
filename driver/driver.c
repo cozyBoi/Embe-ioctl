@@ -245,7 +245,7 @@ static void kernel_timer_blink(unsigned long timeout) {
     fnd_write(loc);
     dot_write(fpga_number[loc[locNotZero]]);
     lcd_write(string);
-    led_write(1 << locNotZero);
+    led_write(1 << (8 - loc[locNotZero]));
     
     mydata.timer.expires = get_jiffies_64() + _interval * 10; //call itself after 3 second
     mydata.timer.data = (unsigned long)&mydata;
@@ -277,7 +277,7 @@ long iom_fpga_driver_ioctl(struct file *flip, unsigned int cmd, unsigned long ar
             dot_write(fpga_number[loc[locNotZero]]);
             printk("end dot init\n");
             lcd_write(string);
-            led_write(1 << locNotZero);
+            led_write(1 << (8 - loc[locNotZero]));
             printk("end set\n");
             break;
         case COMMAND:
