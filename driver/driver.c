@@ -63,8 +63,8 @@ unsigned char fpga_set_blank[10] = {
 #define MAX_BUFF 32
 #define LINE_BUFF 16
 
-unsigned char NAME[16] = {'j', 'h', 'L', 'e', 'e', 0};
-unsigned char STNUM[16] = {'2', '0', '1', '7', '1', '6','7','7', 0};
+unsigned char STNUM[16] = {'j', 'h', 'L', 'e', 'e', 0};
+unsigned char NAME[16] = {'2', '0', '1', '7', '1', '6','7','7', 0};
 unsigned int kernel_call_cnt;
 
 //Global variable
