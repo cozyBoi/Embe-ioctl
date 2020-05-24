@@ -100,7 +100,7 @@ _argus msg;
 static int _interval;
 static int _cnt;
 static int _init;
-static int blink_cnt;
+static int blink_cnt = 1;
 // define functions...
 int iom_fpga_driver_open(struct inode *minode, struct file *mfile);
 int iom_fpga_driver_release(struct inode *minode, struct file *mfile);
@@ -195,7 +195,7 @@ void concat_two_arr(unsigned char a[16], unsigned char b[16], unsigned char stri
 }
 
 void update_loc(){
-    if(blink_cnt == 7){
+    if(blink_cnt == 8){
         unsigned int tmp;
         blink_cnt = 0;
         tmp = loc[locNotZero];
